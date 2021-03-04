@@ -54,9 +54,9 @@ const userSchema = new moogose.Schema(
         },
       },
     ],
-    avatar:{
-      type: Buffer
-    }
+    avatar: {
+      type: Buffer,
+    },
   },
   {
     timestamps: true,
@@ -97,11 +97,21 @@ userSchema.methods.generateJwt = async function () {
 userSchema.statics.findByUserCredentials = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error("Invalid email or password");
+    throw new Error(
+      JSON.stringify({
+        error: 404,
+        message: "User not found.",
+      })
+    );
   }
   const isMatched = await bcrypt.compare(password, user.password);
   if (!isMatched) {
-    throw new Error("Invalid email or password");
+    throw new Error(
+      JSON.stringify({
+        error: 400,
+        message: "Invalid email or password",
+      })
+    );
   }
 
   return user;

@@ -14,7 +14,6 @@ const sendWelcomeMail = (email, name) => {
 };
 
 const sendGoodbyeMail = (email, name) => {
-  console.log(email, name);
   sgMail.send({
     to: email,
     from: "mylife.sb007@gmail.com",

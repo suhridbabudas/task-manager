@@ -4,7 +4,7 @@ const router = express.Router();
 const User = require("../models/user");
 const authMiddleware = require("../middleware/authMiddleware");
 const sharp = require("sharp");
-const {sendWelcomeMail, sendGoodbyeMail} = require("../emails/account");
+const { sendWelcomeMail, sendGoodbyeMail } = require("../emails/account");
 
 const upload = multer({
   limits: {
@@ -53,10 +53,23 @@ router.post("/users/login", async (req, res) => {
       message: "Login successfull.",
     });
   } catch (e) {
-    res.status(400).send({
-      status: 0,
-      error: e.message,
-    });
+    const err = JSON.parse(e.message)
+    if (err.error === 400) {
+      res.status(400).send({
+        status: 0,
+        error: err.message,
+      });
+    } else if(err.error === 404){
+      res.status(404).send({
+        status: 0,
+        error: err.message,
+      });
+    } else{
+      res.status(500).send({
+        status: 0,
+        error: e.message,
+      });
+    }
   }
 });
 
@@ -194,7 +207,7 @@ router.delete("/users/delete-profile", authMiddleware, async (req, res) => {
     //   });
     // }
     await req.user.remove();
-    sendGoodbyeMail(req.user.email, req.user.name)
+    sendGoodbyeMail(req.user.email, req.user.name);
     res.status(200).send({
       status: 1,
       user: req.user,
